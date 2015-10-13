@@ -1,0 +1,32 @@
+{
+  "name": "posthtml-classes",
+  "version": "0.1.0",
+  "description": "PostHTML-plugin to retrieve a list of classes from html",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rajdee/posthtml-classes.git"
+  },
+  "keywords": [
+    "class",
+    "posthtml",
+    "posthtml-plugin"
+  ],
+  "author": "Ruslan Abdullaev <abdullaev.rt@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rajdee/posthtml-classes/issues"
+  },
+  "homepage": "https://github.com/rajdee/posthtml-classes#readme",
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "posthtml": "^0.4.1"
+  },
+  "dependencies": {
+    "gulp-util": "^3.0.6"
+  }
+}
