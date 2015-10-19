@@ -1,7 +1,10 @@
 {
   "ecmaFeatures": {
     "jsx": true,
-    "modules": true
+    "modules": true,
+    "arrowFunctions": true,
+    "blockBindings": true,
+    "destructuring": true
   },
   "env": {
     "browser": true,

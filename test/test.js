@@ -4,14 +4,15 @@ var posthtml = require('posthtml'),
     path = require('path'),
     classes = require('../index.js'),
     expect = require('chai').expect,
-    referenceCSS = readFile('test.css');
+    referenceCSS = readFile('test.css'),
+    referenceCSS2 = readFile('test2.css');
 
-function test(input, options, output, done) {
+function test(input, options, reference, output, done) {
     posthtml()
         .use(classes(options))
         .process(input)
         .then(function (result) {
-            expect(referenceCSS).to.eql(readFile(output));
+            expect(reference).to.eql(readFile(output));
             done();
         }).catch(function (error) {
             done(error);
@@ -46,8 +47,10 @@ describe('Test for block', function () {
                 fileSave: true,
                 filePath: './test/classList.css',
                 overwrite: true,
-                eol: '\n\n'
+                eol: '\n\n',
+                nested: false
             },
+            referenceCSS,
             './classList.css',
             done
         );
@@ -59,7 +62,8 @@ describe('Test for block', function () {
                 fileSave: false,
                 filePath: './test/classList.css',
                 overwrite: true,
-                eol: '\n\n'
+                eol: '\n\n',
+
             }))
             .process('<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>')
             .then(function (result) {
@@ -69,4 +73,21 @@ describe('Test for block', function () {
                 done(error);
             });
     });
+
+    it('Should be equal to the model css (nested css)', function (done) {
+        test(
+            '<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>',
+            {
+                fileSave: true,
+                filePath: './test/classList.css',
+                overwrite: true,
+                eol: '\n',
+                nested: true
+            },
+            referenceCSS2,
+            './classList.css',
+            done
+        );
+    });
+
 });

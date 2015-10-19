@@ -1,0 +1,11 @@
+.animal {
+  &__nose {
+    &_size_long {}
+  }
+}
+.elephant {
+  &__trunk {
+    &_size_short {}
+    &_color_brown {}
+  }
+}
