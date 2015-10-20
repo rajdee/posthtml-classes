@@ -1,7 +1,7 @@
 # PostHTML-classes
 [![npm version](https://badge.fury.io/js/posthtml-classes.svg)](http://badge.fury.io/js/posthtml-classes)
 
-[PostHTML](https://github.com/posthtml/posthtml)-plugin to retrieve a list of classes from html file(s) with support of nested structure
+[PostHTML](https://github.com/posthtml/posthtml)-plugin to retrieve a list of classes from html file(s) with support of nested structure (PostCSS, Stylus, SCSS, LESS)
 
 ## Install
 
@@ -103,7 +103,7 @@ Characters that are added to the end of the CSS rule
 Type: `boolean`  
 Default: `false`
 
-Set `true` if you want to generate css file with support of nested structure, which supported by Stylus, SCSS or LESS preprocessor, or `false` if you want to generate standard css.
+Set `true` if you want to generate css file with support of nested structure, which supported by PostCSS, Stylus, SCSS or LESS preprocessor, or `false` if you want to generate standard css.
 
 
 ## With Gulp
