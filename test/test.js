@@ -4,8 +4,10 @@ var posthtml = require('posthtml'),
     path = require('path'),
     classes = require('../index.js'),
     expect = require('chai').expect,
-    referenceCSS = readFile('test.css'),
-    referenceCSS2 = readFile('test2.css');
+    referenceCSS = '.animal {}\n\n.animal__nose {}\n\n.animal__nose_size_long {}\n\n.elephant__trunk {}\n\n.elephant__trunk_size_short {}\n\n.elephant__trunk_color_brown {}\n',
+    referenceCSS2 = '.animal {\n  &__nose {\n    &_size_long {}\n  }\n}\n.elephant {\n  &__trunk {\n    &_size_short {}\n    &_color_brown {}\n  }\n}',
+    referenceCSS3 = '.animal\n  &__nose\n    &_size_long\n\n.elephant\n  &__trunk\n    &_size_short\n    &_color_brown\n',
+    referenceCSS4 = '.animal\n  &__nose\n    &_size--long\n\n.elephant\n  &__trunk\n    &_size--short\n    &_color--brown\n';
 
 function test(input, options, reference, output, done) {
     posthtml()
@@ -48,7 +50,11 @@ describe('Test for block', function () {
                 filePath: './test/classList.css',
                 overwrite: true,
                 eol: '\n\n',
-                nested: false
+                nested: false,
+                curlbraces: true,
+                elemPrefix: '__',
+                modPrefix: '_',
+                modDlmtr: '_'
             },
             referenceCSS,
             './classList.css',
@@ -63,7 +69,11 @@ describe('Test for block', function () {
                 filePath: './test/classList.css',
                 overwrite: true,
                 eol: '\n\n',
-
+                nested: false,
+                curlbraces: true,
+                elemPrefix: '__',
+                modPrefix: '_',
+                modDlmtr: '_'
             }))
             .process('<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>')
             .then(function (result) {
@@ -74,7 +84,7 @@ describe('Test for block', function () {
             });
     });
 
-    it('Should be equal to the model css (nested css)', function (done) {
+    it('Should be equal to the model css (nested_true)', function (done) {
         test(
             '<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>',
             {
@@ -82,7 +92,11 @@ describe('Test for block', function () {
                 filePath: './test/classList.css',
                 overwrite: true,
                 eol: '\n',
-                nested: true
+                nested: true,
+                curlbraces: true,
+                elemPrefix: '__',
+                modPrefix: '_',
+                modDlmtr: '_'
             },
             referenceCSS2,
             './classList.css',
@@ -90,4 +104,43 @@ describe('Test for block', function () {
         );
     });
 
+   it('Should be equal to the model css (curlbrace_false)', function (done) {
+        test(
+            '<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>',
+            {
+                fileSave: true,
+                filePath: './test/classList.css',
+                overwrite: true,
+                eol: '\n',
+                nested: true,
+                curlbraces: false,
+                elemPrefix: '__',
+                modPrefix: '_',
+                modDlmtr: '_'
+            },
+            referenceCSS3,
+            './classList.css',
+            done
+        );
+    });
+   
+   it('Should be equal to the model css (modDlmtr: "--")', function (done) {
+        test(
+            '<div class="animal"><div class="animal__nose animal__nose_size--long elephant__trunk elephant__trunk_size--short elephant__trunk_color--brown">Nose</div></div>',
+            {
+                fileSave: true,
+                filePath: './test/classList.css',
+                overwrite: true,
+                eol: '\n',
+                nested: true,
+                curlbraces: false,
+                elemPrefix: '__',
+                modPrefix: '_',
+                modDlmtr: '--'
+            },
+            referenceCSS4,
+            './classList.css',
+            done
+        );
+    });
 });

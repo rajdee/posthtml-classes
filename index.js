@@ -1,10 +1,11 @@
 var fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    toClipboard = require('to-clipboard');
 
 module.exports = function (options) {
     'use strict';
 
-    const defaultOptions = {
+    var defaultOptions = {
         fileSave: {
             type: 'boolean',
             default: true
@@ -24,13 +25,30 @@ module.exports = function (options) {
         nested: {
             type: 'boolean',
             default: false
+        },
+        curlbraces: {
+            type: 'boolean',
+            default: true
+        },
+        elemPrefix: {
+            type: 'string',
+            default: '__'
+        },
+        modPrefix: {
+            type: 'string',
+            default: '_'
+        },
+        modDlmtr: {
+            type: 'string',
+            default: '_'
         }
-    };
+    },
+    option;
 
     if (options) {
-        for (let option in defaultOptions) {
+        for (option in defaultOptions) {
             if (!(option in options) || (typeof(options[option]) !== defaultOptions[option].type)) {
-                console.log(`Ouch! '${option}' doesn't exist in options! or type doesn't equal ${defaultOptions[option].type}! Will be used default value`);
+                console.log("Ouch! " + option + " doesn't exist in options! or type doesn't equal " + defaultOptions[option].type + "! Will be used default value");
                 options[option] = defaultOptions[option].default;
             }
         }
@@ -40,17 +58,34 @@ module.exports = function (options) {
             filePath: './classList.css',
             overwrite: false,
             eol: '\n',
-            nested: false
+            nested: false,
+            curlbraces: true,
+            elemPrefix: '__',
+            modPrefix: '_',
+            modDlmtr: '_'
         };
     }
 
-    let classList = Object.create(null);
-
     return function posthtmlClasses(tree) {
-        tree.match({attrs: {class: true}}, function (node) {
-            let classes = node.attrs.class;
+        var results = Object.create(null),
+            classList = Object.create(null),
+            buffer = '',
+            curlbraces = options.eol,
+            openCurlbrace = options.eol,
+            closeCurlbrace = options.eol,
+            block,
+            elem,
+            mods,
+            blockList,
+            elemList,
+            elemMod,
+            list,
+            key,
+            filename,
+            parseName;
 
-            classes.split(' ').forEach(function (item) {
+        tree.match({attrs: {class: true}}, function (node) {
+            node.attrs.class.split(' ').forEach(function (item) {
                 classList[item] = '.' + item;
             });
             return node;
@@ -58,22 +93,21 @@ module.exports = function (options) {
 
         if (Object.getOwnPropertyNames(classList).length) {
 
-            let tmp = '';
+            if (options.curlbraces) {
+                curlbraces = ' {}' + options.eol;
+                openCurlbrace = ' {' + options.eol;
+                closeCurlbrace = '}' + options.eol;
+            }
 
             if (options.nested) {
-                let results = Object.create(null),
-                    block,
-                    blockList,
-                    list;
-
                 function modsParse(sel) {
-                    let list = sel.split('_'),
+                    var list = sel.split(options.modPrefix),
                         a = list[0],
-                        b;
+                        b = null;
 
                     if (list.length > 1) {
                         list.shift();
-                        b = list.join('_');
+                        b = list.join(options.modDlmtr);
                     }
                     return [a, b];
                 }
@@ -86,9 +120,9 @@ module.exports = function (options) {
                         };
                     }
                 }
-
-                for (let key in classList) {
-                    blockList = classList[key].split('__');
+                // Parse css classes from attrs
+                for (key in classList) {
+                    blockList = classList[key].split(options.elemPrefix);
 
                     if (blockList.length > 1) {
                         block = blockList[0];
@@ -96,9 +130,9 @@ module.exports = function (options) {
 
                         initBlock(block);
 
-                        let elem = list[0],
-                            elemMod = list[1],
-                            elemList = results[block]['elems'][elem];
+                        elem = list[0];
+                        elemMod = list[1];
+                        elemList = results[block]['elems'][elem];
 
                         if (elemList) {
                             results[block]['elems'][elem].push(elemMod);
@@ -107,57 +141,64 @@ module.exports = function (options) {
                         }
                     } else {
                         list = modsParse(blockList[0]);
-                        let block = list[0],
-                            mods = list[1];
+                        block = list[0];
+                        mods = list[1];
                         initBlock(block);
                         results[block]['mods'].push(mods);
                     }
                 }
-
-                for (let block in results) {
+                // Generate css
+                for (block in results) {
                     if (block) {
                         // Output block
-                        tmp += block + ' {' + options.eol;
+                        buffer += block + openCurlbrace;
                         // Output block mods
                         if (results[block].mods) {
                             results[block].mods.forEach(function(mod) {
                                 if (mod) {
-                                    tmp += '  &_' + mod + ' {}' + options.eol;
+                                    buffer += '  &' + options.modPrefix + mod + curlbraces;
                                 }
                             });
                         }
                         // Output elem
                         if (results[block].elems) {
-                            for (let elem in results[block].elems) {
-                                tmp += '  &__' + elem + ' {' + options.eol;
+                            for (elem in results[block].elems) {
+                                buffer += '  &' + options.elemPrefix + elem + openCurlbrace;
                                 // Output elem mods
                                 results[block].elems[elem].forEach(function(mod) {
                                     if (mod) {
-                                        tmp += '    &_' + mod + ' {}' + options.eol;
+                                        buffer += '    &' + options.modPrefix + mod + curlbraces;
                                     }
                                 });
-                                tmp += '  }' + options.eol;
+                                if (options.curlbraces) {
+                                    buffer += '  '  + closeCurlbrace;
+                                }
                             }
                         }
-                        tmp += '}' + options.eol;
+                        buffer += closeCurlbrace;
                     }
                 }
             } else {
-                for (let key in classList) {
-                    tmp += classList[key] + ' {}' + options.eol;
+                for (key in classList) {
+                    buffer += classList[key] + curlbraces;
                 }
             }
 
+            // Remove eol at the eof
+            buffer = buffer.slice(0, -1);
+
             if (options.fileSave) {
-                let filename = options.filePath;
+                filename = options.filePath;
 
                 if (!options.overwrite) {
-                    let parseName = path.parse(filename);
+                    parseName = path.parse(filename);
                     filename = parseName.name + '_' + Math.floor(Math.random() * 9999) + parseName.ext;
                 }
 
-                fs.writeFileSync(path.resolve(filename), tmp, 'utf-8');
-                }
+                fs.writeFileSync(path.resolve(filename), buffer, 'utf-8');
+            } else {
+                toClipboard.sync(buffer);
+            }
         }
         return tree;
     };

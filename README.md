@@ -1,7 +1,7 @@
 # PostHTML-classes
 [![npm version](https://badge.fury.io/js/posthtml-classes.svg)](http://badge.fury.io/js/posthtml-classes)
 
-[PostHTML](https://github.com/posthtml/posthtml)-plugin to retrieve a list of classes from html file(s) with support of nested structure (PostCSS, Stylus, SCSS, LESS)
+[PostHTML](https://github.com/posthtml/posthtml)-plugin to retrieve a list of classes from html file(s) with support of nested structure (PostCSS, Stylus, SASS, SCSS, LESS)
 
 ## Install
 
@@ -19,7 +19,11 @@ var posthtml = require('posthtml'),
         filePath: './classList.css',
         overwrite: false,
         eol: '\n',
-        nested: false
+        nested: false,
+        curlbraces: true,
+        elemPrefix: '__',
+        modPrefix: '_',
+        modDlmtr: '_'
     },
     html = '<div block="mad-tea-party"><div elem="march-hare" mods="type:mad">March Hare</div><div elem="hatter" mods="type:mad">Hatter</div><div elem="dormouse" mods="state:sleepy">Dormouse</div></div>';
 
@@ -45,7 +49,11 @@ var posthtml = require('posthtml'),
         filePath: './classList.css',
         overwrite: false,
         eol: '\n',
-        nested: true
+        nested: false,
+        curlbraces: true,
+        elemPrefix: '__',
+        modPrefix: '_',
+        modDlmtr: '_'
     },
     html = '<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>';
 
@@ -75,7 +83,7 @@ posthtml()
 Type: `boolean`  
 Default: `true`
 
-Set `true` if you want to save the file, or `false` if you want to save to buffer (in next version).
+Set `true` if you want to save the file, or `false` if you want to copy to clipboard (Mac/Win/Linux).
 
 #### `filePath`
 
@@ -104,6 +112,35 @@ Type: `boolean`
 Default: `false`
 
 Set `true` if you want to generate css file with support of nested structure, which supported by PostCSS, Stylus, SCSS or LESS preprocessor, or `false` if you want to generate standard css.
+
+#### `curlybraces`
+
+Type: `boolean`  
+Default: `true`
+
+Set `true` if you want to use curly braces, or `false` if you want to generate without them, for example for SASS or Stylus
+
+#### `elemPrefix`
+
+Type: `string`  
+Default: `__`
+
+Characters that can be used for delimiter of element
+
+#### `modPrefix`
+
+Type: `string`  
+Default: `_`
+
+Characters that can be used for delimiter of modifiers
+
+#### `modDlmtr`
+
+Type: `string`  
+Default: `_`
+
+Characters that can be used for the separator modifier values
+
 
 
 ## With Gulp
