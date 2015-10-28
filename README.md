@@ -1,5 +1,6 @@
 # PostHTML-classes
 [![npm version](https://badge.fury.io/js/posthtml-classes.svg)](http://badge.fury.io/js/posthtml-classes)
+[![Build Status](https://travis-ci.org/rajdee/posthtml-classes.svg?branch=master)](https://travis-ci.org/rajdee/posthtml-classes?branch=master)
 
 [PostHTML](https://github.com/posthtml/posthtml)-plugin to retrieve a list of classes from html file(s) with support of nested structure (PostCSS, Stylus, SASS, SCSS, LESS)
 
