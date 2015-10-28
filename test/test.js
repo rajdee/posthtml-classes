@@ -2,14 +2,28 @@
 var posthtml = require('posthtml'),
     fs = require('fs'),
     path = require('path'),
+    exec = require('child_process').exec,
     classes = require('../index.js'),
     expect = require('chai').expect,
     referenceCSS = '.animal {}\n\n.animal__nose {}\n\n.animal__nose_size_long {}\n\n.elephant__trunk {}\n\n.elephant__trunk_size_short {}\n\n.elephant__trunk_color_brown {}\n',
     referenceCSS2 = '.animal {\n  &__nose {\n    &_size_long {}\n  }\n}\n.elephant {\n  &__trunk {\n    &_size_short {}\n    &_color_brown {}\n  }\n}',
     referenceCSS3 = '.animal\n  &__nose\n    &_size_long\n\n.elephant\n  &__trunk\n    &_size_short\n    &_color_brown\n',
-    referenceCSS4 = '.animal\n  &__nose\n    &_size--long\n\n.elephant\n  &__trunk\n    &_size--short\n    &_color--brown\n';
+    referenceCSS4 = '.animal\n  &__nose\n    &_size--long\n\n.elephant\n  &__trunk\n    &_size--short\n    &_color--brown\n',
+    getPlatform,
+    test,
+    readFile,
+    fileExists;
 
-function test(input, options, reference, output, done) {
+getPlatform = function getPlatform() {
+    switch (process.platform) {
+        case 'darwin':
+            return 'pbpaste';
+        case 'linux':
+            return 'xclip -o';
+    }
+};
+
+test = function test(input, options, reference, output, done) {
     posthtml()
         .use(classes(options))
         .process(input)
@@ -19,19 +33,19 @@ function test(input, options, reference, output, done) {
         }).catch(function (error) {
             done(error);
         });
-}
+};
 
-function readFile(filePath) {
+readFile = function readFile(filePath) {
     return fs.readFileSync(path.resolve(__dirname, filePath), 'utf8').toString();
-}
+};
 
-function fileExists(filePath) {
+fileExists = function fileExists(filePath) {
     try {
         return fs.statSync(filePath).isFile();
     } catch (err) {
         return false;
     }
-}
+};
 
 describe('Test for block', function () {
 
@@ -62,27 +76,34 @@ describe('Test for block', function () {
         );
     });
 
-    it('Should be pass if "fileSave" option is disabled', function (done) {
-        posthtml()
-            .use(classes({
-                fileSave: false,
-                filePath: './test/classList.css',
-                overwrite: true,
-                eol: '\n\n',
-                nested: false,
-                curlbraces: true,
-                elemPrefix: '__',
-                modPrefix: '_',
-                modDlmtr: '_'
-            }))
-            .process('<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>')
-            .then(function (result) {
-                expect(fileExists('./test/classList.css')).to.eql(false);
-                done();
-            }).catch(function (error) {
-                done(error);
-            });
-    });
+    if (!process.env.TRAVIS) {
+        it('Should be pass if "fileSave" option is disabled', function (done) {
+            posthtml()
+                .use(classes({
+                    fileSave: false,
+                    filePath: './test/classList.css',
+                    overwrite: true,
+                    eol: '\n\n',
+                    nested: false,
+                    curlbraces: true,
+                    elemPrefix: '__',
+                    modPrefix: '_',
+                    modDlmtr: '_'
+                }))
+                .process('<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>')
+                .then(function () {
+                    exec(getPlatform(), function (error, stdout, stderr) {
+                        expect(referenceCSS).to.eql(stdout);
+                        if (error !== null) {
+                            console.log('exec error: ' + error);
+                        }
+                        done();
+                    });
+                }).catch(function (error) {
+                    done(error);
+                });
+        });
+    }
 
     it('Should be equal to the model css (nested_true)', function (done) {
         test(
