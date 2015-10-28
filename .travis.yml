@@ -5,4 +5,5 @@ node_js:
   - iojs
   - "0.12"
 before_install:
+ - "export DISPLAY=:99.0"
  - "sudo apt-get install xclip xsel --no-install-recommends --yes"

@@ -1,6 +1,6 @@
 {
   "name": "posthtml-classes",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "PostHTML-plugin to retrieve a list of classes from html with support of nested structure",
   "main": "index.js",
   "scripts": {
