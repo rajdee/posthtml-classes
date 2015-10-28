@@ -83,25 +83,28 @@ module.exports = function (options) {
             key,
             filename,
             parseName,
-            modsParse = function modsParse(sel) {
-                var list = sel.split(options.modPrefix),
-                    a = list[0],
-                    b = null;
+            modsParse,
+            initBlock;
+            
+        modsParse = function modsParse(sel) {
+            var list = sel.split(options.modPrefix),
+                a = list[0],
+                b = null;
 
-                if (list.length > 1) {
-                    list.shift();
-                    b = list.join(options.modDlmtr);
-                }
-                return [a, b];
-            },
-            initBlock = function initBlock(block) {
-                if (!results[block]) {
-                    results[block] = {
-                        elems: {},
-                        mods: []
-                    };
-                }
-            };
+            if (list.length > 1) {
+                list.shift();
+                b = list.join(options.modDlmtr);
+            }
+            return [a, b];
+        };
+        initBlock = function initBlock(block) {
+            if (!results[block]) {
+                results[block] = {
+                    elems: {},
+                    mods: []
+                };
+            }
+        };
 
         tree.match({attrs: {class: true}}, function (node) {
             node.attrs.class.split(' ').forEach(function (item) {

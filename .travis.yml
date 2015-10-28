@@ -1,5 +1,8 @@
-sudo: false
+sudo: required
+
 language: node_js
 node_js:
   - iojs
   - "0.12"
+before_install:
+ - "sudo apt-get install xclip xsel --no-install-recommends --yes"
