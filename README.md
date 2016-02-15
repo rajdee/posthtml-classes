@@ -26,13 +26,13 @@ var posthtml = require('posthtml'),
         modPrefix: '_',
         modDlmtr: '_'
     },
-    html = '<div block="mad-tea-party"><div elem="march-hare" mods="type:mad">March Hare</div><div elem="hatter" mods="type:mad">Hatter</div><div elem="dormouse" mods="state:sleepy">Dormouse</div></div>';
+    html = '<div class="animal"><div class="animal__nose animal__nose_size_long elephant__trunk elephant__trunk_size_short elephant__trunk_color_brown">Nose</div></div>';
 
 posthtml()
     .use(require('posthtml-classes')(config))
     .process(html);
     //classList.css
-    //.mad-tea-party {}
+    //.animal {}
     //.mad-tea-party__march-hare {}
     //.mad-tea-party__march-hare_type_mad {}
     //.mad-tea-party__hatter {}
