@@ -31,14 +31,16 @@ var posthtml = require('posthtml'),
 posthtml()
     .use(require('posthtml-classes')(config))
     .process(html);
-    //classList.css
-    //.animal {}
-    //.mad-tea-party__march-hare {}
-    //.mad-tea-party__march-hare_type_mad {}
-    //.mad-tea-party__hatter {}
-    //.mad-tea-party__hatter_type_mad {}
-    //.mad-tea-party__dormouse {}
-    //.mad-tea-party__dormouse_state_sleepy {}
+```
+
+```css
+/*classList.css*/
+.animal {}
+.animal__nose {}
+.animal__nose_size_long {}
+.elephant__trunk {}
+.elephant__trunk_size_short {}
+.elephant__trunk_color_brown {}
 ```
 
 or with support of nested structure
@@ -61,19 +63,21 @@ var posthtml = require('posthtml'),
 posthtml()
     .use(require('posthtml-classes')(config))
     .process(html);
-    //classList.css
-<!-- .animal {
-        &__nose {
-            &_size_long {}
-        }
-     }
-     .elephant {
-        &__trunk {
-            &_size_short {}
-            &_color_brown {}
-        }
-     }
--->
+```
+
+```css
+/*classList.css*/
+.animal {
+  &__nose {
+      &_size_long {}
+  }
+}
+.elephant {
+  &__trunk {
+      &_size_short {}
+      &_color_brown {}
+  }
+}
 ```
 
 
