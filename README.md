@@ -118,7 +118,7 @@ Default: `false`
 
 Set `true` if you want to generate css file with support of nested structure, which supported by PostCSS, Stylus, SCSS or LESS preprocessor, or `false` if you want to generate standard css.
 
-#### `curlybraces`
+#### `curlbraces`
 
 Type: `boolean`  
 Default: `true`
